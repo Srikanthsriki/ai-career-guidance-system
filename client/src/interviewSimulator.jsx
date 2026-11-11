@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "../InterviewSimulator.css";
+import "./InterviewSimulator.css";
 
 function InterviewSimulator({ career = "Data Scientist" }) {
     const [difficulty, setDifficulty] = useState("Medium");

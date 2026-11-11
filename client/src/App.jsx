@@ -3,7 +3,7 @@ import Navigation from "./Navigation";
 import "./Navigation.css";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import InterviewSimulator from "./InterviewSimulator.jsx";
+import InterviewSimulator from "./interviewSimulator.jsx";
 import ReactMarkdown from "react-markdown";
 import {
   RadarChart,
