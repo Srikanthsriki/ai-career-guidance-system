@@ -1,10 +1,11 @@
+require("dotenv").config();
+
 const express = require("express");
 const mongoose = require("mongoose");
 const {
     searchCareerKnowledge
 } = require("./services/careerKnowledgeService");
 const cors = require("cors");
-require("dotenv").config();
 const multer = require("multer");
 const {
     generateCareerEmbeddings

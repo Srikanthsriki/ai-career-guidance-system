@@ -83,20 +83,17 @@ npm install
 
 5. Configure environment variables
 
-Create a ".env" file inside the server folder.
-
-Add the required configuration variables used by the application, such as:
-
-- MongoDB connection string
-- Gemini API key
-- Server port
-- Other service credentials, if required
-
-Never upload your actual ".env" file or API keys to GitHub.
+Copy `server/.env.example` to `server/.env` and set your MongoDB connection string,
+Gemini API key, and a long random JWT secret there. Keep `server/.env` private;
+it is ignored by Git. Do not paste API keys into chat or commit them.
 
 6. Run the application
 
-Check the scripts in the frontend and backend "package.json" files and run the appropriate development commands in separate terminals.
+Start the backend from the `server` folder with `npm run dev`, then start the
+frontend from the `client` folder with `npm run dev`. By default, the backend is
+available at `http://localhost:5000` and the frontend at `http://localhost:5173`.
+
+Never upload your actual `.env` file or API keys to GitHub.
 
 🎯 Project Objective
 
