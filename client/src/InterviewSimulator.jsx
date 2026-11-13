@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./InterviewSimulator.css";
+import { apiUrl } from "./api";
 
 function InterviewSimulator({ career = "Data Scientist" }) {
     const [difficulty, setDifficulty] = useState("Medium");
@@ -35,7 +36,7 @@ function InterviewSimulator({ career = "Data Scientist" }) {
             );
 
             const response = await fetch(
-                "http://localhost:5000/api/interview/question",
+                apiUrl("/api/interview/question"),
                 {
                     method: "POST",
                     headers: {
@@ -103,7 +104,7 @@ function InterviewSimulator({ career = "Data Scientist" }) {
             setError("");
 
             const response = await fetch(
-                "http://localhost:5000/api/interview/evaluate",
+                apiUrl("/api/interview/evaluate"),
                 {
                     method: "POST",
                     headers: {
@@ -171,7 +172,7 @@ function InterviewSimulator({ career = "Data Scientist" }) {
             setError("");
 
             const response = await fetch(
-                "http://localhost:5000/api/interview/report",
+                apiUrl("/api/interview/report"),
                 {
                     method: "POST",
                     headers: {

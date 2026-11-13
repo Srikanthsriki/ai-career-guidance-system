@@ -5,6 +5,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import InterviewSimulator from "./InterviewSimulator";
 import ReactMarkdown from "react-markdown";
+import { apiUrl } from "./api";
 import {
   RadarChart,
   Radar,
@@ -642,7 +643,7 @@ function App() {
     const restoreAccount = async () => {
       try {
         const response = await fetch(
-          "http://localhost:5000/api/auth/me",
+          apiUrl("/api/auth/me"),
           {
             headers: {
               Authorization: `Bearer ${authToken}`
@@ -701,8 +702,8 @@ function App() {
     try {
       const endpoint =
         authMode === "register"
-          ? "http://localhost:5000/api/auth/register"
-          : "http://localhost:5000/api/auth/login";
+          ? apiUrl("/api/auth/register")
+          : apiUrl("/api/auth/login");
 
       const response = await fetch(endpoint, {
         method: "POST",
@@ -788,7 +789,7 @@ function App() {
       setAnalyticsError("");
 
       const response = await fetch(
-        "http://localhost:5000/api/analytics"
+        apiUrl("/api/analytics")
       );
 
       const result = await response.json();
@@ -864,7 +865,7 @@ function App() {
     const loadSavedGuidance = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/students/${studentId}/guidance`,
+          apiUrl(`/api/students/${studentId}/guidance`),
           {
             headers: {
               "Authorization": `Bearer ${sessionStorage.getItem("authToken")}`
@@ -979,7 +980,7 @@ function App() {
 
       try {
         const response = await fetch(
-          `http://localhost:5000/api/progress/${studentId}`,
+          apiUrl(`/api/progress/${studentId}`),
           {
             headers: {
               "Authorization": `Bearer ${sessionStorage.getItem("authToken")}`
@@ -1019,7 +1020,7 @@ function App() {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/progress/${studentId}`,
+        apiUrl(`/api/progress/${studentId}`),
         {
           method: "PUT",
           headers: {
@@ -1097,7 +1098,7 @@ function App() {
       setResumeResult(null);
 
       const response = await fetch(
-        "http://localhost:5000/api/resume/upload",
+        apiUrl("/api/resume/upload"),
         {
           method: "POST",
           body: formData
@@ -1200,7 +1201,7 @@ function App() {
       setAlignmentResult(null);
 
       const response = await fetch(
-        "http://localhost:5000/api/career-alignment",
+        apiUrl("/api/career-alignment"),
         {
           method: "POST",
           body: uploadData
@@ -1323,7 +1324,7 @@ function App() {
       setIsSavingProfile(true);
 
       const response = await fetch(
-        `http://localhost:5000/api/student/profile/${studentId}`,
+        apiUrl(`/api/student/profile/${studentId}`),
         {
           method: "PUT",
           headers: {
@@ -1399,7 +1400,7 @@ function App() {
       setAgentLoading(true);
 
       const response = await fetch(
-        "http://localhost:5000/api/career-agent/chat",
+        apiUrl("/api/career-agent/chat"),
         {
           method: "POST",
           headers: {
@@ -1459,7 +1460,7 @@ function App() {
       setKnowledgeResults([]);
 
       const response = await fetch(
-        "http://localhost:5000/api/career-knowledge/search",
+        apiUrl("/api/career-knowledge/search"),
         {
           method: "POST",
           headers: {
@@ -1522,7 +1523,7 @@ function App() {
       setResourceResults(null);
 
       const response = await fetch(
-        "http://localhost:5000/api/learning-resources/search",
+        apiUrl("/api/learning-resources/search"),
         {
           method: "POST",
           headers: {
@@ -1594,7 +1595,7 @@ function App() {
 
       const response =
         await fetch(
-          "http://localhost:5000/api/students",
+          apiUrl("/api/students"),
           {
 
             method: "POST",

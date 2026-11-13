@@ -87,7 +87,17 @@ Copy `server/.env.example` to `server/.env` and set your MongoDB connection stri
 Gemini API key, and a long random JWT secret there. Keep `server/.env` private;
 it is ignored by Git. Do not paste API keys into chat or commit them.
 
-6. Run the application
+6. Configure the deployed frontend
+
+The root `vercel.json` installs and builds the frontend from `client`. In the
+Vercel project settings, add the environment variable `VITE_API_URL` with the
+public URL of your deployed backend, for example
+`https://your-backend.onrender.com` (do not add `/api`). Redeploy after setting
+the variable so it is included in the frontend build. The local frontend defaults
+to `http://localhost:5000`; a missing production URL is reported as a
+configuration error instead of sending requests to the visitor's computer.
+
+7. Run the application
 
 Start the backend from the `server` folder with `npm run dev`, then start the
 frontend from the `client` folder with `npm run dev`. By default, the backend is
