@@ -17,12 +17,13 @@ import {
     Menu,
     X,
     ChevronLeft,
-    ChevronRight
+    ChevronRight,
+    LogOut
 } from "lucide-react";
 
 import "./Navigation.css";
 
-function Navigation({ activeSection, setActiveSection }) {
+function Navigation({ activeSection, setActiveSection, onLogout }) {
 
     const [collapsed, setCollapsed] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
@@ -162,11 +163,10 @@ function Navigation({ activeSection, setActiveSection }) {
                         return (
                             <button
                                 key={item.id}
-                                className={`sidebar-link ${
-                                    activeSection === item.id
+                                className={`sidebar-link ${activeSection === item.id
                                         ? "active"
                                         : ""
-                                }`}
+                                    }`}
                                 onClick={() =>
                                     handleNavigation(item.id)
                                 }
@@ -203,6 +203,18 @@ function Navigation({ activeSection, setActiveSection }) {
 
                     </div>
                 )}
+                <button
+                    type="button"
+                    className="sidebar-logout"
+                    onClick={() => {
+                        setMobileOpen(false);
+                        onLogout?.();
+                    }}
+                    title={collapsed ? "Logout" : ""}
+                >
+                    <LogOut size={20} />
+                    {!collapsed && <span>Logout</span>}
+                </button>
 
             </aside>
         </>

@@ -5700,3 +5700,33 @@ body:has(.sidebar.collapsed) .app {
   transform: none !important;
   box-shadow: none !important;
 }
+/* =====================================
+   LOGOUT BUTTON
+===================================== */
+
+.logout-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 18px;
+  padding: 10px 22px;
+  background: #dc3545;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logout-button:hover {
+  background: #b02a37;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.25);
+}
+
+.logout-button:active {
+  transform: scale(0.97);
+}

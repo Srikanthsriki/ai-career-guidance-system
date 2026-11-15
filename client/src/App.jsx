@@ -785,6 +785,49 @@ function App() {
       setAuthLoading(false);
     }
   };
+  // ========================================
+  // HANDLE STUDENT LOGOUT
+  // ========================================
+
+  const handleLogout = () => {
+    const confirmLogout = window.confirm(
+      "Are you sure you want to logout?"
+    );
+
+    if (!confirmLogout) return;
+
+    // Clear authentication session
+    sessionStorage.removeItem("authToken");
+
+    // Reset authentication state
+    setAuthToken(null);
+    setAccount(null);
+    setStudentId(null);
+
+    // Clear student data
+    setFormData({
+      name: "",
+      education: "",
+      skills: "",
+      interests: "",
+      programming: "",
+      experience: "",
+      career: ""
+    });
+
+    setGuidance(null);
+    setOriginalProfileData(null);
+    setIsEditingProfile(false);
+
+    // Clear AI Career Agent data
+    setAgentMessage("");
+    setAgentChatHistory([]);
+
+    // Return to login page
+    setActiveSection("career");
+    setAuthMode("login");
+    setAuthMessage("");
+  };
   const [activeSection, setActiveSection] = useState("career");
   // Knowledge Base States
   const [knowledgeQuery, setKnowledgeQuery] = useState("");
@@ -795,11 +838,14 @@ function App() {
   const [agentLoading, setAgentLoading] = useState(false);
   const [agentChatHistory, setAgentChatHistory] = useState([]);
   // AI AGENT VOICE INPUT
+  // AI AGENT VOICE INPUT
   const [isListening, setIsListening] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
   const [voiceError, setVoiceError] = useState("");
   const [showVoicePanel, setShowVoicePanel] = useState(false);
 
-  const recognitionRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
   // LEARNING RESOURCES STATES
   const [resourceCareer, setResourceCareer] = useState("");
   const [resourceCategory, setResourceCategory] = useState("all");
@@ -1265,66 +1311,145 @@ function App() {
   // AI CAREER AGENT VOICE INPUT
   // ============================================
 
-  const startVoiceRecognition = () => {
-    const SpeechRecognition =
-      window.SpeechRecognition ||
-      window.webkitSpeechRecognition;
+  // ============================================
+  // AI CAREER AGENT VOICE TRANSCRIPTION API
+  // ============================================
 
-    if (!SpeechRecognition) {
-      setVoiceError(
-        "Voice recognition is not supported in this browser. Please use Google Chrome."
-      );
-      return;
-    }
 
-    const recognition = new SpeechRecognition();
+  // ============================================
+  // AI CAREER AGENT HANDLER
+  // ============================================
+  // ============================================
+  // AI CAREER AGENT VOICE INPUT - GEMINI
+  // ============================================
 
-    recognition.lang = "en-IN";
-    recognition.continuous = false;
-    recognition.interimResults = false;
-
-    recognition.onstart = () => {
-      setIsListening(true);
-      setShowVoicePanel(true);
+  const startVoiceRecognition = async () => {
+    try {
       setVoiceError("");
-    };
+      setShowVoicePanel(true);
 
-    recognition.onresult = (event) => {
-      const transcript =
-        event.results[0][0].transcript;
+      if (!navigator.mediaDevices?.getUserMedia) {
+        throw new Error("Microphone access is not supported. Use HTTPS and a supported browser.");
+      }
 
-      setAgentMessage((previous) =>
-        previous
-          ? previous + " " + transcript
-          : transcript
+      if (!window.MediaRecorder) {
+        throw new Error("Audio recording is not supported in this browser.");
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true
+      });
+
+      const supportedTypes = [
+        "audio/webm;codecs=opus",
+        "audio/webm",
+        "audio/mp4"
+      ];
+
+      const mimeType = supportedTypes.find(type =>
+        MediaRecorder.isTypeSupported(type)
       );
-    };
 
-    recognition.onerror = (event) => {
-      console.log("Voice Recognition Error:", event.error);
+      const recorder = mimeType
+        ? new MediaRecorder(stream, { mimeType })
+        : new MediaRecorder(stream);
 
-      setVoiceError(
-        `Voice error: ${event.error}`
-      );
+      audioChunksRef.current = [];
+      mediaRecorderRef.current = recorder;
+
+      recorder.ondataavailable = (event) => {
+        if (event.data && event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      recorder.onstart = () => {
+        setIsListening(true);
+        setShowVoicePanel(true);
+      };
+
+      recorder.onstop = async () => {
+        setIsListening(false);
+        setIsTranscribing(true);
+
+        try {
+          const audioBlob = new Blob(audioChunksRef.current, {
+            type: recorder.mimeType || mimeType || "audio/webm"
+          });
+
+          if (!audioBlob.size) {
+            throw new Error("No audio was recorded. Please try again.");
+          }
+
+          const extension = audioBlob.type.includes("mp4")
+            ? "mp4"
+            : "webm";
+
+          const uploadData = new FormData();
+
+          uploadData.append(
+            "audio",
+            audioBlob,
+            `voice.${extension}`
+          );
+
+          const response = await fetch(
+            `${API_BASE_URL}/api/voice/transcribe`,
+            {
+              method: "POST",
+              body: uploadData
+            }
+          );
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.message || "Voice transcription failed.");
+          }
+
+          if (!data.transcript?.trim()) {
+            throw new Error("No speech was recognized.");
+          }
+
+          setAgentMessage(previous =>
+            previous
+              ? previous + " " + data.transcript.trim()
+              : data.transcript.trim()
+          );
+
+        } catch (error) {
+          console.error("Voice upload error:", error);
+          setVoiceError(error.message || "Unable to transcribe your voice.");
+
+        } finally {
+          stream.getTracks().forEach(track => track.stop());
+          audioChunksRef.current = [];
+          mediaRecorderRef.current = null;
+
+          setIsTranscribing(false);
+          setIsListening(false);
+          setShowVoicePanel(false);
+        }
+      };
+
+      recorder.start();
+
+    } catch (error) {
+      console.error("Voice recording error:", error);
+      setVoiceError(error.message || "Unable to start voice recording.");
 
       setIsListening(false);
+      setIsTranscribing(false);
       setShowVoicePanel(false);
-    };
-
-    recognition.onend = () => {
-      setIsListening(false);
-    };
-
-    recognitionRef.current = recognition;
-    recognition.start();
-  };
-  const stopVoiceRecognition = () => {
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
     }
+  };
 
-    setIsListening(false);
-    setShowVoicePanel(false);
+  const stopVoiceRecognition = () => {
+    const recorder = mediaRecorderRef.current;
+
+    if (recorder && recorder.state === "recording") {
+      recorder.stop();
+    }
   };
   const handleSaveProfile = async () => {
     if (!studentId) {
@@ -1389,6 +1514,7 @@ function App() {
     } catch (error) {
       console.error("Profile update error:", error);
       alert(error.message || "Unable to update profile.");
+
     } finally {
       setIsSavingProfile(false);
     }
@@ -1402,10 +1528,6 @@ function App() {
     setIsEditingProfile(false);
     setOriginalProfileData(null);
   };
-  // ============================================
-  // AI CAREER AGENT HANDLER
-  // ============================================
-
   const handleCareerAgent = async () => {
 
     if (!agentMessage.trim()) {
@@ -2744,7 +2866,10 @@ function App() {
 
 
       <div className="app">
-        <Navigation activeSection={activeSection} setActiveSection={handleSectionNavigation} />
+        <Navigation activeSection={activeSection} 
+        setActiveSection={handleSectionNavigation}
+        onLogout={handleLogout}
+        />
 
 
 
@@ -4421,8 +4546,13 @@ function App() {
               </div>
               {showVoicePanel && (
                 <div className="agent-voice-panel">
+
                   <h3>
-                    {isListening ? "Listening..." : "Recording stopped"}
+                    {isListening
+                      ? "Listening... Speak now"
+                      : isTranscribing
+                        ? "Transcribing your voice..."
+                        : "Recording stopped"}
                   </h3>
 
                   <div className="agent-voice-waves">
@@ -4431,15 +4561,24 @@ function App() {
                     ))}
                   </div>
 
-                  <p>Speak your career-related question</p>
+                  <p>
+                    {isListening
+                      ? "Speak your career-related question"
+                      : isTranscribing
+                        ? "Please wait while Gemini converts your speech into text."
+                        : "Voice recording completed."}
+                  </p>
 
-                  <button
-                    type="button"
-                    className="agent-stop-button"
-                    onClick={stopVoiceRecognition}
-                  >
-                    Stop Recording
-                  </button>
+                  {isListening && (
+                    <button
+                      type="button"
+                      className="agent-stop-button"
+                      onClick={stopVoiceRecognition}
+                    >
+                      Stop Recording
+                    </button>
+                  )}
+
                 </div>
               )}
 
@@ -4456,7 +4595,7 @@ function App() {
                   type="button"
                   className={`agent-mic-button ${isListening ? "listening" : ""}`}
                   onClick={startVoiceRecognition}
-                  disabled={agentLoading || isListening}
+                  disabled={agentLoading || isListening || isTranscribing}
                   title="Start voice input"
                 >
                   <svg

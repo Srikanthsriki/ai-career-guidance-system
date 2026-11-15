@@ -259,3 +259,42 @@
         display: none;
     }
 }
+
+/* SIDEBAR LOGOUT BUTTON */
+
+.sidebar-logout {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 14px;
+    width: calc(100% - 30px);
+    min-height: 47px;
+    margin: 10px 15px 20px;
+    padding: 0 14px;
+    background: #7f1d1d;
+    color: #ffffff;
+    border: 1px solid #991b1b;
+    border-radius: 9px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.sidebar-logout:hover {
+    background: #dc2626;
+    border-color: #ef4444;
+}
+
+.sidebar-logout:active {
+    transform: scale(0.98);
+}
+
+.collapsed .sidebar-logout {
+    justify-content: center;
+    padding: 0;
+}
+
+.sidebar-logout span {
+    white-space: nowrap;
+}
