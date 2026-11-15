@@ -19,6 +19,9 @@ const {
     evaluateInterviewAnswer,
     generateInterviewReport
 } = require("./services/interviewService");
+const {
+    transcribeVoice
+} = require("./services/voiceTranscriptionService");
 
 
 const Student = require("./models/student");
@@ -57,6 +60,7 @@ const upload = multer({
         fileSize: 5 * 1024 * 1024
     }
 });
+
 
 // ========================================
 // REQUEST LOGGER
@@ -725,6 +729,45 @@ app.post("/api/interview/report", async (req, res) => {
         });
     }
 });
+// ============================================
+// AI CAREER AGENT VOICE TRANSCRIPTION API
+// ============================================
+
+app.post(
+    "/api/voice/transcribe",
+    upload.single("audio"),
+    async (req, res) => {
+        try {
+            if (!req.file) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Please record your voice first."
+                });
+            }
+
+            console.log("Voice transcription request received");
+
+            const transcript = await transcribeVoice(
+                req.file.buffer,
+                req.file.mimetype
+            );
+
+            return res.status(200).json({
+                success: true,
+                transcript
+            });
+
+        } catch (error) {
+            console.error("Voice transcription error:", error);
+
+            return res.status(500).json({
+                success: false,
+                message: error.message ||
+                    "Voice transcription failed."
+            });
+        }
+    }
+);
 // ============================================
 // AI CAREER AGENT API
 // ============================================
