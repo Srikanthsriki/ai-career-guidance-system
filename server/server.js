@@ -1161,7 +1161,115 @@ app.get("/api/students/:studentId/guidance", authenticateStudent, async (req, re
         });
     }
 });
+// ========================================
+// REGENERATE STUDENT CAREER GUIDANCE
+// ========================================
 
+app.put(
+    "/api/students/:studentId/guidance",
+    authenticateStudent,
+    async (req, res) => {
+        try {
+            const { studentId } = req.params;
+
+            // 1. Verify profile ownership
+            if (
+                !req.account ||
+                !req.account.studentId ||
+                req.account.studentId.toString() !== studentId
+            ) {
+                return res.status(403).json({
+                    success: false,
+                    message: "You are not authorized to update this career profile."
+                });
+            }
+
+            // 2. Validate student ID
+            if (!mongoose.Types.ObjectId.isValid(studentId)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid student ID."
+                });
+            }
+
+            // 3. Get existing student document
+            const student = await Student.findById(studentId);
+
+            if (!student) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Student profile not found."
+                });
+            }
+
+            // 4. Validate required profile fields
+            const fields = [
+                "name",
+                "education",
+                "skills",
+                "interests",
+                "programming",
+                "experience",
+                "career"
+            ];
+
+            for (const field of fields) {
+                const value = req.body[field];
+
+                if (typeof value !== "string" || !value.trim()) {
+                    return res.status(400).json({
+                        success: false,
+                        message: `${field} is required.`
+                    });
+                }
+
+                student[field] = value.trim();
+            }
+
+            // 5. Validate the updated profile
+            const validation = await validateStudentProfile(student);
+
+            if (!validation.isValid) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Profile validation failed.",
+                    issues: validation.issues
+                });
+            }
+
+            // 6. Generate fresh AI career guidance
+            const aiGuidance = await getCareerGuidance(student);
+
+            if (!aiGuidance) {
+                return res.status(500).json({
+                    success: false,
+                    message: "AI career guidance could not be generated."
+                });
+            }
+
+            // 7. Save updated profile and guidance
+            student.aiGuidance = aiGuidance;
+            await student.save();
+
+            // 8. Send updated data to frontend
+            return res.status(200).json({
+                success: true,
+                message: "Career guidance regenerated successfully.",
+                student,
+                aiGuidance
+            });
+
+        } catch (error) {
+            console.error("Career guidance regeneration error:", error);
+
+            return res.status(500).json({
+                success: false,
+                message: "Failed to regenerate career guidance.",
+                error: error.message
+            });
+        }
+    }
+);
 // ========================================
 // STUDENT PROGRESS API
 // ========================================
