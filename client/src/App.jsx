@@ -1724,7 +1724,7 @@ function App() {
   /* =======================================================
      SUBMIT
   ======================================================= */
-
+  
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -1732,12 +1732,23 @@ function App() {
     setGuidance(null);
 
     try {
-      console.log("Sending student data...");
+      const existingStudentId =
+        studentId || localStorage.getItem("studentId");
+
+      const isExistingStudent = Boolean(existingStudentId);
+
+      console.log(
+        isExistingStudent
+          ? "Regenerating career guidance..."
+          : "Sending new student data..."
+      );
 
       const response = await fetch(
-        `${API_BASE_URL}/api/students`,
+        isExistingStudent
+          ? `${API_BASE_URL}/api/students/${existingStudentId}/guidance`
+          : `${API_BASE_URL}/api/students`,
         {
-          method: "POST",
+          method: isExistingStudent ? "PUT" : "POST",
           headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${sessionStorage.getItem("authToken")}`
@@ -1770,10 +1781,17 @@ function App() {
       }
 
       setGuidance(normalized);
+
       setStudentId(data.student._id);
       localStorage.setItem("studentId", data.student._id);
+
       setActiveSection("dashboard");
-      setMessage("Student data saved successfully!");
+
+      setMessage(
+        isExistingStudent
+          ? "Career guidance regenerated successfully!"
+          : "Student data saved successfully!"
+      );
 
     } catch (error) {
       console.error("Frontend error:", error);
@@ -1819,7 +1837,7 @@ function App() {
   /* =======================================================
      DOWNLOAD PDF REPORT
   ======================================================= */
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
 
     try {
 
@@ -1847,6 +1865,18 @@ function App() {
           "mm",
           "a4"
         );
+      const logo = new Image();
+      logo.src = "/apex-logo.jpg";
+
+      await new Promise((resolve, reject) => {
+        if (logo.complete && logo.naturalWidth > 0) {
+          resolve();
+        } else {
+          logo.onload = resolve;
+          logo.onerror = reject;
+        }
+      });
+
 
 
       const pageWidth =
@@ -1923,6 +1953,16 @@ function App() {
             "helvetica",
             "bold"
           );
+          if (logo.complete && logo.naturalWidth > 0) {
+            doc.addImage(
+              logo,
+              "JPEG",
+              margin,
+              y - 12,
+              18,
+              18
+            );
+          }
 
 
           doc.text(
@@ -2744,7 +2784,10 @@ function App() {
       <div className="auth-container">
         <div className="auth-card">
 
-          <h1>AI Career Guidance</h1>
+          <div className="auth-logo">
+            <img src="/apex-logo.jpg" alt="APEX PREDATOR Logo" />
+            <h1>AI Career Guidance</h1>
+          </div>
 
           <p>
             {authMode === "login"
@@ -2866,9 +2909,9 @@ function App() {
 
 
       <div className="app">
-        <Navigation activeSection={activeSection} 
-        setActiveSection={handleSectionNavigation}
-        onLogout={handleLogout}
+        <Navigation activeSection={activeSection}
+          setActiveSection={handleSectionNavigation}
+          onLogout={handleLogout}
         />
 
 
@@ -2882,7 +2925,7 @@ function App() {
         <header className="header">
 
           <div className="robot">
-            🤖
+            <img src="/apex-logo.jpg" alt="APEX PREDATOR Logo" />
           </div>
 
           <h1>
