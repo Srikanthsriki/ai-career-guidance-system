@@ -2,6 +2,10 @@
   "dependencies": {
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
+<<<<<<< HEAD
+=======
+    "nodemailer": "^10.5.0",
+>>>>>>> upstream/main
     "recharts": "^3.10.1"
   }
 }

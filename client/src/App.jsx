@@ -1724,7 +1724,11 @@ function App() {
   /* =======================================================
      SUBMIT
   ======================================================= */
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> upstream/main
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -1732,12 +1736,32 @@ function App() {
     setGuidance(null);
 
     try {
+<<<<<<< HEAD
       console.log("Sending student data...");
 
       const response = await fetch(
         `${API_BASE_URL}/api/students`,
         {
           method: "POST",
+=======
+      const existingStudentId =
+        studentId || localStorage.getItem("studentId");
+
+      const isExistingStudent = Boolean(existingStudentId);
+
+      console.log(
+        isExistingStudent
+          ? "Regenerating career guidance..."
+          : "Sending new student data..."
+      );
+
+      const response = await fetch(
+        isExistingStudent
+          ? `${API_BASE_URL}/api/students/${existingStudentId}/guidance`
+          : `${API_BASE_URL}/api/students`,
+        {
+          method: isExistingStudent ? "PUT" : "POST",
+>>>>>>> upstream/main
           headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${sessionStorage.getItem("authToken")}`
@@ -1770,10 +1794,24 @@ function App() {
       }
 
       setGuidance(normalized);
+<<<<<<< HEAD
       setStudentId(data.student._id);
       localStorage.setItem("studentId", data.student._id);
       setActiveSection("dashboard");
       setMessage("Student data saved successfully!");
+=======
+
+      setStudentId(data.student._id);
+      localStorage.setItem("studentId", data.student._id);
+
+      setActiveSection("dashboard");
+
+      setMessage(
+        isExistingStudent
+          ? "Career guidance regenerated successfully!"
+          : "Student data saved successfully!"
+      );
+>>>>>>> upstream/main
 
     } catch (error) {
       console.error("Frontend error:", error);
@@ -1819,7 +1857,11 @@ function App() {
   /* =======================================================
      DOWNLOAD PDF REPORT
   ======================================================= */
+<<<<<<< HEAD
   const handleDownloadPDF = () => {
+=======
+  const handleDownloadPDF = async () => {
+>>>>>>> upstream/main
 
     try {
 
@@ -1847,6 +1889,21 @@ function App() {
           "mm",
           "a4"
         );
+<<<<<<< HEAD
+=======
+      const logo = new Image();
+      logo.src = "/apex-logo.jpg";
+
+      await new Promise((resolve, reject) => {
+        if (logo.complete && logo.naturalWidth > 0) {
+          resolve();
+        } else {
+          logo.onload = resolve;
+          logo.onerror = reject;
+        }
+      });
+
+>>>>>>> upstream/main
 
 
       const pageWidth =
@@ -1923,6 +1980,19 @@ function App() {
             "helvetica",
             "bold"
           );
+<<<<<<< HEAD
+=======
+          if (logo.complete && logo.naturalWidth > 0) {
+            doc.addImage(
+              logo,
+              "JPEG",
+              margin,
+              y - 12,
+              18,
+              18
+            );
+          }
+>>>>>>> upstream/main
 
 
           doc.text(
@@ -2744,7 +2814,14 @@ function App() {
       <div className="auth-container">
         <div className="auth-card">
 
+<<<<<<< HEAD
           <h1>AI Career Guidance</h1>
+=======
+          <div className="auth-logo">
+            <img src="/apex-logo.jpg" alt="APEX PREDATOR Logo" />
+            <h1>AI Career Guidance</h1>
+          </div>
+>>>>>>> upstream/main
 
           <p>
             {authMode === "login"
@@ -2866,9 +2943,15 @@ function App() {
 
 
       <div className="app">
+<<<<<<< HEAD
         <Navigation activeSection={activeSection} 
         setActiveSection={handleSectionNavigation}
         onLogout={handleLogout}
+=======
+        <Navigation activeSection={activeSection}
+          setActiveSection={handleSectionNavigation}
+          onLogout={handleLogout}
+>>>>>>> upstream/main
         />
 
 
@@ -2882,7 +2965,11 @@ function App() {
         <header className="header">
 
           <div className="robot">
+<<<<<<< HEAD
             🤖
+=======
+            <img src="/apex-logo.jpg" alt="APEX PREDATOR Logo" />
+>>>>>>> upstream/main
           </div>
 
           <h1>

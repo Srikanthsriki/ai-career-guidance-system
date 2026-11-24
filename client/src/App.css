@@ -215,7 +215,11 @@ select {
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
 }
 
+<<<<<<< HEAD
 .student-card > h2 {
+=======
+.student-card>h2 {
+>>>>>>> upstream/main
   margin: 0 0 25px;
   color: #17324d !important;
   font-size: 28px;
@@ -233,6 +237,10 @@ select {
   opacity: 1;
   visibility: visible;
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/main
 .profile-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -5543,7 +5551,11 @@ body:has(.sidebar.collapsed) .app {
 /* AI CAREER AGENT MICROPHONE */
 
 .agent-mic-button {
+<<<<<<< HEAD
   transform:translateY(6px);
+=======
+  transform: translateY(6px);
+>>>>>>> upstream/main
   width: 48px;
   height: 48px;
   min-width: 48px;
@@ -5700,6 +5712,10 @@ body:has(.sidebar.collapsed) .app {
   transform: none !important;
   box-shadow: none !important;
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/main
 /* =====================================
    LOGOUT BUTTON
 ===================================== */
@@ -5729,4 +5745,32 @@ body:has(.sidebar.collapsed) .app {
 
 .logout-button:active {
   transform: scale(0.97);
+<<<<<<< HEAD
+=======
+}
+
+.auth-logo {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.auth-logo img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.auth-logo h1 {
+  margin: 0;
+}
+
+.header .robot img {
+  width: 55px;
+  height: 55px;
+  object-fit: contain;
+  border-radius: 8px;
+  vertical-align: middle;
+>>>>>>> upstream/main
 }
